@@ -1,0 +1,8 @@
+CREATE TABLE tb_item_pedido(
+cd_item_pedido INT PRIMARY KEY,
+cd_pedido INT,
+cd_produto INT,
+qt_item_produto INT,
+vl_unitario_item DECIMAL(10,2),
+FOREIGN KEY (cd_pedido) REFERENCES tb_pedido(cd_pedido),
+FOREIGN KEY (cd_produto) REFERENCES tb_produto(cd_produto));
