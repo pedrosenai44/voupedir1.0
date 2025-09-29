@@ -1,14 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:pedrohenrique/banco/restaurante_dao.dart';
+import 'package:pedrohenrique/restaurante.dart';
+import 'package:pedrohenrique/tela_cad_restaurante.dart';
+import 'restaurante.dart';
 
-class TelaHome extends StatelessWidget{
-  TelaHome ({super.key});
+class TelaHome extends StatefulWidget {
+  TelaHome({super.key});
 
+  @override
+  State<TelaHome> createState() => TelaHomeState();
+}
+
+
+class TelaHomeState extends State<TelaHome>{
+  /***************************************************/
+List<Restaurante> restaurantes = [];
+
+
+Future <void> carregaRestaurantes() async{
+  final lista = await RestauranteDAO.listarTodos();
+  setState((){
+    restaurantes = lista;
+  });
+}
+
+
+@override
+void initState(){
+  super.initState();
+  carregaRestaurantes();
+}
+/*****************************************************/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text ("seja bem vindo usuário:")),
-      body: const Center(
-        child: Text("Tela de Home"),
+      appBar: AppBar(
+          title: const Text ("Lista de Restaurantes"),
+        actions: [
+          IconButton(onPressed: (){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => TelaCadRestaurante())
+            );
+          }, icon: Icon(Icons.add))
+        ],
+      ),
+      body: Padding(padding: const EdgeInsets.all(10),
+        child: ListView.builder(
+          itemCount: restaurantes.length,
+          itemBuilder: (context, index){
+            final r = restaurantes[index];
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                title: Text(r.nome ?? 'Sem Nome'),
+                subtitle: Text('ID ${r.codigo}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(onPressed: (){
+                      //codigo para Editar Restaurante
+                    },
+                        icon: Icon(Icons.edit,color: Colors.blue)
+                    ),IconButton(onPressed: (){
+                      AlertDialog(
+                        title: Text("Confirmar Exclusão"),
+                        content: Text("Deseja realmente excluir?"),
+                        actions: [
+                          TextButton(
+                              onPressed: (){
+                                //codigo para Excluir Restaurante
+                              }, child: Text("Sim")
+
+                          ),TextButton(
+                              onPressed: (){
+                                //codigo para Excluir Restaurante
+                              }, child: Text("Não")
+
+                          ),
+                        ],
+
+                      );
+                    },
+                        icon: Icon(Icons.edit,color: Colors.red)
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => TelaCadRestaurante())
+            );
+          },
+        child: Icon(Icons.add),
       ),
     );
 

@@ -51,7 +51,7 @@ class TelaLogin extends StatelessWidget{
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Usuário ou senha Inválidos!" ))
             );
-          }, child: const Text('logar'))
+          }, child: const Text('logar?'))
       ],
     ),
       ),
