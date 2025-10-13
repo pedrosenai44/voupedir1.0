@@ -19,9 +19,8 @@ class DatabaseHelper {
       List<int> bytes = data.buffer.asInt8List(
           data.offsetInBytes, data.lengthInBytes);
       await File(caminho).writeAsBytes(bytes);
-      }
+    }
     _db = await openDatabase(caminho);
     return _db!;
-    }
   }
-
+}

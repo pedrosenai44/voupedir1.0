@@ -1,60 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:pedrohenrique/tela_home.dart';
-import 'usuario.dart';
-import 'package:flutter/material.dart';
-import 'banco/usuario_dao.dart';
+import 'package:pedrohenrique/tela_cad_restaurante.dart';
+import '../restaurante.dart';
+import 'banco/restaurante_dao.dart';
 
-
-class TelaLogin extends StatelessWidget{
-  TelaLogin({super.key});
-
-  /*Usuario u = Usuario(
-    nome: 'admin',
-      login: 'admin',
-    senha: '@senhaforte123',
-    codigo: 1
-  );*/
-
-  final TextEditingController usuarioController = TextEditingController();
-  final TextEditingController senhaController = TextEditingController();
+class TelaHome extends StatefulWidget {
+  TelaHome({super.key});
 
   @override
-  Widget build(BuildContext context){
+  State<TelaHome> createState() => TelaHomeState();
+}
+
+class TelaHomeState extends State<TelaHome>{
+  List<Restaurante> restaurantes = [];
+
+  @override
+  void initState(){
+    super.initState();
+    carregarRestaurantes();
+  }
+
+
+  Future<void> carregarRestaurantes() async{
+    final lista = await RestauranteDAO.listarTodos();
+    setState(() {
+      restaurantes = lista;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-    appBar: AppBar(title: const Text("Tela de Login")),
-    body:Padding (padding: const EdgeInsets.all(24.0),
-    child:Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextField(
-          decoration: const InputDecoration(labelText: 'Usuário'),
-          controller: usuarioController,
-        ),
-        const SizedBox(height: 20),
-        TextField(
-          decoration: const InputDecoration(labelText: 'Senha'),
-          obscureText: true,
-          controller: senhaController,
-        ),
-        SizedBox(height: 20),
-          ElevatedButton(onPressed:() async {
-
-            final sucesso = await UsuarioDAO.autenticar(usuarioController.text, senhaController.text);
-
-            if(sucesso){
-              Navigator.push(context,
-              MaterialPageRoute(builder: (context) => TelaHome())
-              );
-            }else{
-
-            }
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Usuário ou senha Inválidos!" ))
-            );
-          }, child: const Text('logar?'))
-      ],
-    ),
+      appBar: AppBar(
+        title: const Text("Lista de Restaurantes "),
+        actions: [
+          IconButton(
+              onPressed: () async{
+                final t = await Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadRestaurante()));
+                if(t == false || t == null){
+                  setState(() {
+                    carregarRestaurantes();
+                  });
+                }
+              },
+              icon: Icon(Icons.add)
+          )
+        ],
       ),
+      body: Padding(padding: const EdgeInsets.all(10),
+        child: ListView.builder(
+            itemCount: restaurantes.length,
+            itemBuilder: (context, index){
+              final r = restaurantes[index];
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(r.nome ?? 'sem nome'),
+                  subtitle: Text('ID: ${r.codigo}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadRestaurante()));
+                      }, icon: Icon(Icons.edit, color: Colors.blue,)),
+                      IconButton(onPressed: (){}, icon: Icon(Icons.delete, color: Colors.red)),
+                    ],
+                  ),
+                ),
+              );
+            }
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadRestaurante()));
+          },
+          child: Icon(Icons.add)
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const<BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Adicionar'),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Adicionar'),
+        ],
+      ),
+
     );
   }
 }
